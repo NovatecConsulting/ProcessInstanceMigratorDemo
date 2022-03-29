@@ -14,4 +14,8 @@ public class SellingContext {
     public void sendDocs() {
         System.out.println("Docs have been sent!\n");
     }
+
+    public void doPayment() {
+        System.out.println("Payment successful!\n");
+    }
 }
