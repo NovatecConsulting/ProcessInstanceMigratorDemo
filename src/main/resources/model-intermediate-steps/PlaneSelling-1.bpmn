@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0117lip" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
-  <bpmn:process id="listeners" isExecutable="true">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0117lip" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.4" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="planeSelling" name="Verkauf eines Flugzeugs" isExecutable="false" camunda:versionTag="1.0.0">
     <bpmn:startEvent id="StartEventProcessStarted" name="Flugzeug angefordert">
       <bpmn:outgoing>Flow_1ybik1w</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_1ybik1w" sourceRef="StartEventProcessStarted" targetRef="UserTaksDoSomething" />
-    <bpmn:sequenceFlow id="Flow_0ni5utb" sourceRef="UserTaksDoSomething" targetRef="EndEventProcessEnded" />
+    <bpmn:sequenceFlow id="Flow_1ybik1w" sourceRef="StartEventProcessStarted" targetRef="UserTask_UnterlagenAnfordern" />
+    <bpmn:sequenceFlow id="Flow_0ni5utb" sourceRef="UserTask_UnterlagenAnfordern" targetRef="EndEventProcessEnded" />
     <bpmn:endEvent id="EndEventProcessEnded" name="Flugzeug verkauft">
       <bpmn:incoming>Flow_0ni5utb</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:userTask id="UserTaksDoSomething" name="Kauf-Unterlagen anfordern">
-      <bpmn:extensionElements>
-        <camunda:taskListener delegateExpression="${listenToTask}" event="complete" />
-      </bpmn:extensionElements>
+    <bpmn:userTask id="UserTask_UnterlagenAnfordern" name="Kauf-Unterlagen anfordern">
       <bpmn:incoming>Flow_1ybik1w</bpmn:incoming>
       <bpmn:outgoing>Flow_0ni5utb</bpmn:outgoing>
     </bpmn:userTask>
   </bpmn:process>
   <bpmn:message id="Message_1gu71x5" name="SomeMessage" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="listeners">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="planeSelling">
       <bpmndi:BPMNEdge id="Flow_0ni5utb_di" bpmnElement="Flow_0ni5utb">
         <di:waypoint x="440" y="117" />
         <di:waypoint x="592" y="117" />
@@ -40,7 +37,7 @@
           <dc:Bounds x="566" y="142" width="89" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0suw5nb_di" bpmnElement="UserTaksDoSomething">
+      <bpmndi:BPMNShape id="Activity_0suw5nb_di" bpmnElement="UserTask_UnterlagenAnfordern">
         <dc:Bounds x="340" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
