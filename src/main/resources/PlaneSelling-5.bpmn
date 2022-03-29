@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0117lip" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.4" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:message id="Message_1gu71x5" name="SomeMessage" />
+  <bpmn:collaboration id="Collaboration_0bo0a68">
+    <bpmn:participant id="Participant_1ih7pxs" name="Flugzeugverkauf" processRef="planeSelling" />
+  </bpmn:collaboration>
+  <bpmn:process id="planeSelling" name="Verkauf eines Flugzeugs" isExecutable="true" camunda:versionTag="1.1.2">
+    <bpmn:laneSet id="LaneSet_0xnkoie">
+      <bpmn:lane id="Lane_15lz5ea" name="Vertrieb">
+        <bpmn:flowNodeRef>StartEventProcessStarted</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ExclusiveGateway_1gknlay</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UserTask_UnterlagenErstellen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ReceiveTask_DokumenteErhalten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UserTask_DokumentePruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1dug3z3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0h10i5e</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SendTask_UnterlagenVersenden</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>LinkEventDocsDone</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CallActivity_PremiumRabatteErmitteln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_0zed99m</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_01asosr" name="Buchhaltung">
+        <bpmn:flowNodeRef>LinkEventDocsDoneCatch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEventProcessEnded</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTaskZahlungAusfuehren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UserTask_ZahlungVorbereiten</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:sequenceFlow id="Flow_1ybik1w" sourceRef="StartEventProcessStarted" targetRef="ExclusiveGateway_1gknlay" />
+    <bpmn:startEvent id="StartEventProcessStarted" name="Flugzeug angefordert">
+      <bpmn:outgoing>Flow_1ybik1w</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1gknlay" name="Premium-Kunde?" default="SequenceFlow_0zslg7j">
+      <bpmn:incoming>Flow_1ybik1w</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0zslg7j</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1r7xfz5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0zslg7j" sourceRef="ExclusiveGateway_1gknlay" targetRef="Gateway_0h10i5e" />
+    <bpmn:sequenceFlow id="SequenceFlow_1r7xfz5" sourceRef="ExclusiveGateway_1gknlay" targetRef="CallActivity_PremiumRabatteErmitteln">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${sellingContext.isPremiumCustomer()}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="UserTask_UnterlagenErstellen" name="Kauf-Unterlagen erstellen">
+      <bpmn:incoming>Flow_128pjkq</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ni5utb</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:receiveTask id="ReceiveTask_DokumenteErhalten" name="Dokumente erhalten">
+      <bpmn:incoming>SequenceFlow_04xo4ox</bpmn:incoming>
+      <bpmn:outgoing>Flow_0o9pmii</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:userTask id="UserTask_DokumentePruefen" name="Dokumente prüfen">
+      <bpmn:incoming>Flow_0o9pmii</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rpkwuj</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_1dug3z3" name="Dokumente okay?" default="Flow_1e06ax9">
+      <bpmn:incoming>Flow_0rpkwuj</bpmn:incoming>
+      <bpmn:outgoing>Flow_1e06ax9</bpmn:outgoing>
+      <bpmn:outgoing>Flow_01aka3t</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_0h10i5e">
+      <bpmn:incoming>Flow_01aka3t</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0zslg7j</bpmn:incoming>
+      <bpmn:outgoing>Flow_128pjkq</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="SendTask_UnterlagenVersenden" name="Kauf-Unterlagen versenden" camunda:expression="${sellingContext.sendDocs()}">
+      <bpmn:incoming>Flow_0ni5utb</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_04xo4ox</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:intermediateThrowEvent id="LinkEventDocsDone" name="Dokumente vollständig">
+      <bpmn:incoming>Flow_1e06ax9</bpmn:incoming>
+      <bpmn:linkEventDefinition name="DokumentsDone" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_128pjkq" sourceRef="Gateway_0h10i5e" targetRef="UserTask_UnterlagenErstellen" />
+    <bpmn:sequenceFlow id="Flow_0ni5utb" sourceRef="UserTask_UnterlagenErstellen" targetRef="SendTask_UnterlagenVersenden" />
+    <bpmn:sequenceFlow id="SequenceFlow_04xo4ox" sourceRef="SendTask_UnterlagenVersenden" targetRef="ReceiveTask_DokumenteErhalten" />
+    <bpmn:sequenceFlow id="Flow_0o9pmii" sourceRef="ReceiveTask_DokumenteErhalten" targetRef="UserTask_DokumentePruefen" />
+    <bpmn:sequenceFlow id="Flow_0rpkwuj" sourceRef="UserTask_DokumentePruefen" targetRef="Gateway_1dug3z3" />
+    <bpmn:sequenceFlow id="Flow_1e06ax9" name="ja" sourceRef="Gateway_1dug3z3" targetRef="LinkEventDocsDone" />
+    <bpmn:sequenceFlow id="Flow_01aka3t" name="nein" sourceRef="Gateway_1dug3z3" targetRef="Gateway_0h10i5e">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!sellingContext.areDocsOkay()}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1ygukv9" sourceRef="CallActivity_PremiumRabatteErmitteln" targetRef="EndEvent_0zed99m" />
+    <bpmn:intermediateCatchEvent id="LinkEventDocsDoneCatch" name="Dokumente vollständig">
+      <bpmn:outgoing>SequenceFlow_05es2tr</bpmn:outgoing>
+      <bpmn:linkEventDefinition name="DokumentsDone" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="EndEventProcessEnded" name="Flugzeug verkauft">
+      <bpmn:incoming>SequenceFlow_0utr60r</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="ServiceTaskZahlungAusfuehren" name="Zahlung ausführen" camunda:expression="${sellingContext.doPayment()}">
+      <bpmn:incoming>SequenceFlow_03uud4t</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0utr60r</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="UserTask_ZahlungVorbereiten" name="Zahlung vorbereiten">
+      <bpmn:incoming>SequenceFlow_05es2tr</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_03uud4t</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_05es2tr" sourceRef="LinkEventDocsDoneCatch" targetRef="UserTask_ZahlungVorbereiten" />
+    <bpmn:sequenceFlow id="SequenceFlow_0utr60r" sourceRef="ServiceTaskZahlungAusfuehren" targetRef="EndEventProcessEnded" />
+    <bpmn:sequenceFlow id="SequenceFlow_03uud4t" sourceRef="UserTask_ZahlungVorbereiten" targetRef="ServiceTaskZahlungAusfuehren" />
+    <bpmn:callActivity id="CallActivity_PremiumRabatteErmitteln" name="Premium-Rabatte ermitteln" calledElement="PremiumRabatte">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1r7xfz5</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ygukv9</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="EndEvent_0zed99m" name="Premium-Rabatte ermittelt">
+      <bpmn:incoming>SequenceFlow_1ygukv9</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0bo0a68">
+      <bpmndi:BPMNShape id="Participant_1ih7pxs_di" bpmnElement="Participant_1ih7pxs">
+        <dc:Bounds x="129" y="-29" width="1194" height="584" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEventProcessStarted">
+        <dc:Bounds x="220" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="210" y="105" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0suw5nb_di" bpmnElement="UserTask_UnterlagenErstellen">
+        <dc:Bounds x="474" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0j0y56a_di" bpmnElement="ReceiveTask_DokumenteErhalten">
+        <dc:Bounds x="793" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mx4rvm_di" bpmnElement="UserTask_DokumentePruefen">
+        <dc:Bounds x="963" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1dug3z3_di" bpmnElement="Gateway_1dug3z3" isMarkerVisible="true">
+        <dc:Bounds x="1118" y="55" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1098" y="26" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0h10i5e_di" bpmnElement="Gateway_0h10i5e" isMarkerVisible="true">
+        <dc:Bounds x="389" y="55" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendTask_192jikg_di" bpmnElement="SendTask_UnterlagenVersenden">
+        <dc:Bounds x="624" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_04xo4ox_di" bpmnElement="SequenceFlow_04xo4ox">
+        <di:waypoint x="724" y="80" />
+        <di:waypoint x="793" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01aka3t_di" bpmnElement="Flow_01aka3t">
+        <di:waypoint x="1143" y="105" />
+        <di:waypoint x="1143" y="183" />
+        <di:waypoint x="414" y="183" />
+        <di:waypoint x="414" y="105" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="946" y="165" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_128pjkq_di" bpmnElement="Flow_128pjkq">
+        <di:waypoint x="439" y="80" />
+        <di:waypoint x="474" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e06ax9_di" bpmnElement="Flow_1e06ax9">
+        <di:waypoint x="1168" y="80" />
+        <di:waypoint x="1232" y="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1196" y="62" width="9" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rpkwuj_di" bpmnElement="Flow_0rpkwuj">
+        <di:waypoint x="1063" y="80" />
+        <di:waypoint x="1118" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0o9pmii_di" bpmnElement="Flow_0o9pmii">
+        <di:waypoint x="893" y="80" />
+        <di:waypoint x="963" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ybik1w_di" bpmnElement="Flow_1ybik1w">
+        <di:waypoint x="256" y="80" />
+        <di:waypoint x="292" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ni5utb_di" bpmnElement="Flow_0ni5utb">
+        <di:waypoint x="574" y="80" />
+        <di:waypoint x="624" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Lane_15lz5ea_di" bpmnElement="Lane_15lz5ea">
+        <dc:Bounds x="159" y="-29" width="1164" height="370" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_01asosr_di" bpmnElement="Lane_01asosr">
+        <dc:Bounds x="159" y="341" width="1164" height="214" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_0ds90zf_di" bpmnElement="LinkEventDocsDone">
+        <dc:Bounds x="1232" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1222" y="105" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_1gshbxl_di" bpmnElement="LinkEventDocsDoneCatch">
+        <dc:Bounds x="220" y="414" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="210" y="457" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_05es2tr_di" bpmnElement="SequenceFlow_05es2tr">
+        <di:waypoint x="256" y="432" />
+        <di:waypoint x="474" y="432" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_03uud4t_di" bpmnElement="SequenceFlow_03uud4t">
+        <di:waypoint x="574" y="432" />
+        <di:waypoint x="963" y="432" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1fqfmpm_di" bpmnElement="EndEventProcessEnded">
+        <dc:Bounds x="1232" y="414" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1206" y="457" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0utr60r_di" bpmnElement="SequenceFlow_0utr60r">
+        <di:waypoint x="1063" y="432" />
+        <di:waypoint x="1232" y="432" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1mvfyoe_di" bpmnElement="ServiceTaskZahlungAusfuehren">
+        <dc:Bounds x="963" y="392" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0474yy7_di" bpmnElement="UserTask_ZahlungVorbereiten">
+        <dc:Bounds x="474" y="392" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1gknlay_di" bpmnElement="ExclusiveGateway_1gknlay" isMarkerVisible="true">
+        <dc:Bounds x="292" y="55" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="274" y="33" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zslg7j_di" bpmnElement="SequenceFlow_0zslg7j">
+        <di:waypoint x="342" y="80" />
+        <di:waypoint x="389" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1r7xfz5_di" bpmnElement="SequenceFlow_1r7xfz5">
+        <di:waypoint x="317" y="105" />
+        <di:waypoint x="317" y="262" />
+        <di:waypoint x="474" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0zed99m_di" bpmnElement="EndEvent_0zed99m">
+        <dc:Bounds x="646" y="244" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="621" y="287" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ygukv9_di" bpmnElement="SequenceFlow_1ygukv9">
+        <di:waypoint x="574" y="262" />
+        <di:waypoint x="646" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CallActivity_1bbrtrm_di" bpmnElement="CallActivity_PremiumRabatteErmitteln">
+        <dc:Bounds x="474" y="222" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

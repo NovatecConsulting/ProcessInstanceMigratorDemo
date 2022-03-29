@@ -18,4 +18,8 @@ public class SellingContext {
     public void doPayment() {
         System.out.println("Payment successful!\n");
     }
+
+    public boolean isPremiumCustomer() {
+        return new Random().nextInt(2) < 1;
+    }
 }
