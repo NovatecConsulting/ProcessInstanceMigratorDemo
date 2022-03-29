@@ -4,7 +4,7 @@
   <bpmn:collaboration id="Collaboration_0bo0a68">
     <bpmn:participant id="Participant_1ih7pxs" name="Flugzeugverkauf" processRef="planeSelling" />
   </bpmn:collaboration>
-  <bpmn:process id="planeSelling" name="Verkauf eines Flugzeugs" isExecutable="true" camunda:versionTag="1.1.2">
+  <bpmn:process id="planeSelling" name="Verkauf eines Flugzeugs" isExecutable="false" camunda:versionTag="1.1.2">
     <bpmn:laneSet id="LaneSet_0xnkoie">
       <bpmn:lane id="Lane_15lz5ea" name="Vertrieb">
         <bpmn:flowNodeRef>StartEventProcessStarted</bpmn:flowNodeRef>

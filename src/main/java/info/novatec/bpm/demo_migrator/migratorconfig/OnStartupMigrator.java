@@ -15,6 +15,6 @@ public class OnStartupMigrator {
 
     @EventListener(ApplicationReadyEvent.class)
     public void migrateAllProcessInstances() {
-        //processInstanceMigrator.migrateInstancesOfAllProcesses();
+        processInstanceMigrator.migrateInstancesOfAllProcesses();
     }
 }
