@@ -10,4 +10,8 @@ public class SellingContext {
     public boolean areDocsOkay() {
         return new Random().nextInt(2) < 1;
     }
+
+    public void sendDocs() {
+        System.out.println("Docs have been sent!\n");
+    }
 }
